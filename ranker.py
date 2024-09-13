@@ -16,7 +16,7 @@ def get_csrf_token():
     response = requests.post('https://auth.roblox.com/v2/logout', headers=HEADERS)
     if response.status_code == 403:
         return response.headers['x-csrf-token']
-    raise Exception("Unable to retrieve CSRF token")
+    raise Exception("can't get csrf token")
 
 def get_group_roles():
     response = requests.get(f'https://groups.roblox.com/v1/groups/{GROUP_ID}/roles', headers=HEADERS)
@@ -28,7 +28,7 @@ def get_role_id_by_name(role_name):
     for role in roles:
         if role['name'].lower() == role_name.lower():
             return role['id']
-    raise ValueError(f"Role with name '{role_name}' not found")
+    raise ValueError(f"the '{role_name}' was not found")
 
 def get_all_users():
     users = []
@@ -64,7 +64,7 @@ def change_user_role(user, role_id):
             json={'roleId': role_id}
         )
         response.raise_for_status()
-        print(f"User with ID {user_id} promoted to role ID {role_id}")
+        print(f"User with ID {user_id} promoted to {TARGET_ROLE_NAME}")
     except requests.RequestException as e:
         print(f"Failed to promote user with ID {user_id}: {e}. Response: {response.text if response else 'No response'}")
 
@@ -80,7 +80,7 @@ except ValueError as e:
 all_users = get_all_users()
 
 if all_users:
-    print(f"Sample user data structure: {all_users[0]}")
+    print(f"loaded users")
 
 with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
     futures = [executor.submit(change_user_role, user, TARGET_ROLE_ID) for user in all_users]
@@ -89,6 +89,6 @@ with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         try:
             future.result()
         except Exception as e:
-            print(f"Error processing user: {e}")
+            print(f"Error ranking user: {e}")
 
 print("All users have been ranked.")
